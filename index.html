@@ -7,11 +7,13 @@
 
   <!-- CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin=""/>
+  <link rel="stylesheet" href="./css/leaflet.groupedlayercontrol.css" />
 
   <!-- JS -->
   <script src="https://unpkg.com/browse/jquery@3.3.1/dist/jquery.min.js" async></script>
   <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js" integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew==" crossorigin=""></script>
   <script src="./js/leaflet.ajax.min.js"> </script>
+  <script src="./js/leaflet.groupedlayercontrol.js"></script>
 
   <style>
 		html, body {
@@ -65,11 +67,29 @@
         "opacity": 1
     };
 
+    var meterStyle= {
+      radius: 2,
+      fillColor: "#ff7800",
+      color: "#000",
+      weight: 1,
+      opacity: 1,
+      fillOpacity: 0.8
+    };
+
+    var valveStyle= {
+      radius: 2,
+      fillColor: "#f3a6b2",
+      color: "#000",
+      weight: 1,
+      opacity: 1,
+      fillOpacity: 0.8
+    };
+
     var waterLines = new L.GeoJSON.AJAX("data/waterLines.geojson", {
       style: waterStyle,
       onEachFeature: function (feature, layer) {
         layer.bindPopup(
-          '<h3>' + feature.properties.DIAMETER + feature.properties.MATERIAL + '</h3>'
+          '<h3>' + feature.properties.DIAMETER + ' ' + feature.properties.MATERIAL + '</h3>'
       )},
     });
 
@@ -77,16 +97,41 @@
       style: sewerStyle,
       onEachFeature: function (feature, layer) {
         layer.bindPopup(
-          '<h3>' + feature.properties.DIAMETER+ '</h3>'
+          '<h3>' + feature.properties.Diameter + '</h3>'
       )},
     });
 
-    var featureLayers = {
-      "Satellite": sewerLines,
-      "Plain Base": waterLines
-		};
+    var meters = new L.GeoJSON.AJAX("data/meters.geojson", {
+      pointToLayer: function (feature, latlng) {
+       return L.circleMarker(latlng, meterStyle);
+      }
+    });
 
-    L.control.layers(featureLayers).addTo(map);
+    var valves = new L.GeoJSON.AJAX("data/valves.geojson", {
+      pointToLayer: function (feature, latlng) {
+       return L.circleMarker(latlng, valveStyle);
+      }
+    });
+
+    var groupedOverlays = {
+      "Utility Lines": {
+        "Water": waterLines,
+        "Sewer": sewerLines
+      },
+      "Utility Points": {
+        "Meters": meters,
+        "Valves": valves
+      }
+    };
+
+    var options = {
+      groupCheckboxes: true
+    };
+
+    var layerControl = L.control.groupedLayers(groupedOverlays, options);
+    map.addControl(layerControl);
+
+
 
 
 
