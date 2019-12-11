@@ -27,16 +27,7 @@
 		}
 	</style>
 
-	<style>
-    body {
-      padding: 0;
-      margin: 0;
-  }
-  html, body, #map {
-      height: 100%;
-      width: 100vw;
-  }
-  </style>
+	<style>body { padding: 0; margin: 0; } #map { height: 100%; width: 100vw; }</style>
 </head>
 
 <body>
@@ -52,7 +43,7 @@
     var map = L.map('map', {
     			    layers: [googleSat] // only add one!
     		    })
-    		    .locate({setView: true, maxZoom: 22});
+    		    .locate({setView: true, maxZoom: 16});
     // end basemaps //
 
     // feature styles, then layers //
