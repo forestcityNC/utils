@@ -124,12 +124,7 @@
       }
     };
 
-    var options = {
-      groupCheckboxes: true
-    };
-
-    var layerControl = L.control.groupedLayers(groupedOverlays, options);
-    map.addControl(layerControl);
+    var layerControl = L.control.groupedLayers(groupedOverlays).addTo(map);
 
 
 
