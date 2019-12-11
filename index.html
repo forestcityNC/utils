@@ -7,13 +7,12 @@
 
   <!-- CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin=""/>
-  <link rel="stylesheet" href="./css/leaflet.groupedlayercontrol.css" />
 
   <!-- JS -->
   <script src="https://unpkg.com/browse/jquery@3.3.1/dist/jquery.min.js" async></script>
   <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js" integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew==" crossorigin=""></script>
   <script src="./js/leaflet.ajax.min.js"> </script>
-  <script src="./js/leaflet.groupedlayercontrol.js"></script>
+
 
   <style>
 		html, body {
@@ -113,18 +112,14 @@
       }
     });
 
-    var groupedOverlays = {
-      "Utility Lines": {
-        "Water": waterLines,
-        "Sewer": sewerLines
-      },
-      "Utility Points": {
-        "Meters": meters,
-        "Valves": valves
-      }
-    };
+    var featureLayers = {
+      "Water Lines": waterLines,
+      "Sewer Lines": sewerLines,
+      "Water Meter": meters,
+      "Water Valve": valves
+		};
 
-    var layerControl = L.control.groupedLayers(groupedOverlays).addTo(map);
+    L.control.layers(featureLayers).addTo(map);
 
 
 
