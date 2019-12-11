@@ -1,0 +1,75 @@
+<<!DOCTYPE html>
+<html>
+<head>
+  <title>Forest City - Water Line Viewer</title>
+	<meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin=""/>
+
+  <!-- JS -->
+  <script src="https://unpkg.com/browse/jquery@3.3.1/dist/jquery.min.js" async></script>
+  <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js" integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew==" crossorigin=""></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-ajax/2.1.0/leaflet.ajax.min.js"></script>
+
+  <style>
+		html, body {
+			height: 100%;
+			margin: 0;
+		}
+		#map {
+			width: 600px;
+			height: 400px;
+		}
+	</style>
+
+	<style>
+    body {
+      padding: 0;
+      margin: 0;
+  }
+  html, body, #map {
+      height: 100%;
+      width: 100vw;
+  }
+  </style>
+</head>
+
+<body>
+<div id='map'></div>
+
+
+
+  <script>
+    // basemaps and layers //
+
+    var googleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{ maxZoom: 20, subdomains:['mt0','mt1','mt2','mt3']});
+
+    var map = L.map('map', {
+    			    layers: [googleSat] // only add one!
+    		    })
+    		    .setView([35.33, -81.86], 16);
+    // end basemaps //
+    
+    // feature styles, then layers //
+    var waterStyle = {
+        "color": "#487bb6",
+        "weight": 1,
+        "opacity": 0.50
+    };
+
+    var waterLines = new L.GeoJSON.AJAX("./data/waterLines.geojson", {
+      style: waterStyle,
+      onEachFeature: function (feature, layer) {
+        layer.bindPopup(
+          '<h3>' + feature.properties.DIAMETER + feature.properties.MATERIAL + '</h3>'
+      )},
+    }).addTo(map);
+
+
+
+
+  </script>
+</body>
+</html>
