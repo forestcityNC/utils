@@ -56,18 +56,18 @@
     // feature styles, then layers //
     var waterStyle = {
         "color": "#487bb6",
-        "weight": 1,
+        "weight": 3,
         "opacity": 1
     };
 
     var sewerStyle = {
         "color": "#33a02c",
-        "weight": 1,
+        "weight": 3,
         "opacity": 1
     };
 
     var meterStyle= {
-      radius: 2,
+      radius: 3,
       fillColor: "#ff7800",
       color: "#000",
       weight: 1,
@@ -76,7 +76,7 @@
     };
 
     var valveStyle= {
-      radius: 2,
+      radius: 3,
       fillColor: "#f3a6b2",
       color: "#000",
       weight: 1,
@@ -103,23 +103,31 @@
     var meters = new L.GeoJSON.AJAX("data/meters.geojson", {
       pointToLayer: function (feature, latlng) {
        return L.circleMarker(latlng, meterStyle);
-      }
+     },
+      onEachFeature: function (feature, layer) {
+        layer.bindPopup(
+          '<h3>' + feature.properties.description + '</h3>'
+      )},
     });
 
     var valves = new L.GeoJSON.AJAX("data/valves.geojson", {
       pointToLayer: function (feature, latlng) {
        return L.circleMarker(latlng, valveStyle);
-      }
+     },
+      onEachFeature: function (feature, layer) {
+        layer.bindPopup(
+          '<h3>' + feature.properties.Feature + '</h3>'
+      )},
     });
 
-    var featureLayers = {
+    var overlays = {
       "Water Lines": waterLines,
       "Sewer Lines": sewerLines,
       "Water Meter": meters,
       "Water Valve": valves
 		};
 
-    L.control.layers(featureLayers).addTo(map);
+    L.control.layers(overlays).addTo(map);
 
 
 
