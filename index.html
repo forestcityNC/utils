@@ -43,7 +43,7 @@
     var map = L.map('map', {
     			    layers: [googleSat] // only add one!
     		    })
-    		    .locate({setView: true, maxZoom: 16});
+    		    .setView([35.33, -81.86], 16);
     // end basemaps //
 
     // feature styles, then layers //
@@ -124,7 +124,7 @@
     map.addLayer(sewerLines)
 
     L.control.layers(overlays).addTo(map);
-  //  L.control.locate().addTo(map);
+    L.control.locate().addTo(map);
 
 
 
