@@ -42,12 +42,7 @@
 
     var map = L.map('map', {
     			    layers: [googleSat] // only add one!
-    		    })
-<<<<<<< HEAD
-    		    .setView([35.33, -81.86], 16);
-=======
-    		    .locate({setView: true, maxZoom: 16});
->>>>>>> parent of 351b278... setview
+    		    }).setView([35.339744, -81.872195], 18);
     // end basemaps //
 
     // feature styles, then layers //
@@ -128,7 +123,7 @@
     map.addLayer(sewerLines)
 
     L.control.layers(overlays).addTo(map);
-    L.control.locate().addTo(map);
+    //L.control.locate().addTo(map);
 
 
 
