@@ -47,7 +47,7 @@
   <script>
     // basemaps and layers //
 
-    var googleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{ maxZoom: 20, subdomains:['mt0','mt1','mt2','mt3']});
+    var googleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{ maxZoom: 22, subdomains:['mt0','mt1','mt2','mt3']});
 
     var map = L.map('map', {
     			    layers: [googleSat] // only add one!
@@ -118,7 +118,7 @@
      },
       onEachFeature: function (feature, layer) {
         layer.bindPopup(
-          '<h3>' + feature.properties.Feature + '</h3>'
+          '<h3>' + feature.properties.FEATURE + '</h3>'
       )},
     });
 
@@ -131,7 +131,7 @@
 
     map.addLayer(waterLines)
     map.addLayer(sewerLines)
-    
+
     L.control.layers(overlays).addTo(map);
     L.control.locate().addTo(map);
 
