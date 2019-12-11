@@ -43,7 +43,11 @@
     var map = L.map('map', {
     			    layers: [googleSat] // only add one!
     		    })
+<<<<<<< HEAD
     		    .setView([35.33, -81.86], 16);
+=======
+    		    .locate({setView: true, maxZoom: 16});
+>>>>>>> parent of 351b278... setview
     // end basemaps //
 
     // feature styles, then layers //
