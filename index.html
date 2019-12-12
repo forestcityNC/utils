@@ -9,12 +9,14 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin=""/>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.68.0/dist/L.Control.Locate.min.css" />
+  <link rel="stylesheet" href="./css/leaflet-panel-layers.min.css" />
 
   <!-- JS -->
-  <script src="https://unpkg.com/browse/jquery@3.3.1/dist/jquery.min.js" async></script>
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js" integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew==" crossorigin=""></script>
   <script src="./js/leaflet.ajax.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.68.0/dist/L.Control.Locate.min.js" charset="utf-8"></script>
+  <script src="./js/leaflet-panel-layers.min.js"></script>
 
   <style>
 		html, body {
@@ -36,14 +38,31 @@
 
 
   <script>
-    // basemaps and layers //
+    var map = L.map('map', {
+    			    //layers: [googleSat, sewerLines, waterLines]
+    		}).setView([35.339744, -81.872195], 18);
+
+    // basemaps, added in L.control.panellayers  //
 
     var googleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
-      maxZoom: 22,
-      subdomains:['mt0','mt1','mt2','mt3']
+          maxZoom: 22,
+          subdomains:['mt0','mt1','mt2','mt3']
     });
 
+    var mapboxStreets = L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v9/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiZGJoYXJyaXM5MiIsImEiOiJjamo1dm5hOGswOHMzM2tubm12OGhjdXdzIn0.MXeiHXd9767rehYZ2fBVHQ', {
+	        maxZoom: 22,
+	        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    });
 
+    var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+	        maxZoom: 22,
+	        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    });
+
+    var googleHybrid = L.tileLayer('http://mt0.google.com/vt/lyrs=y&hl=en&x={x}&y={y}&z={z}&s=Ga',{
+          maxZoom: 22,
+          subdomains:['mt0','mt1','mt2','mt3']
+    });
     // end basemaps //
 
     // feature styles, then layers //
@@ -113,18 +132,76 @@
       )},
     });
 
-    var overlays = {
-      "Water Lines": waterLines,
-      "Sewer Lines": sewerLines,
-      "Water Meter": meters,
-      "Water Valve": valves
-		};
+    // var overlays = {
+    //   "Water Lines": waterLines,
+    //   "Sewer Lines": sewerLines,
+    //   "Water Meter": meters,
+    //   "Water Valve": valves
+		// };
 
-    var map = L.map('map', {
-    			    layers: [googleSat, sewerLines, waterLines] // only add one!
-    		    }).setView([35.339744, -81.872195], 18);
+    var baseLayers = [
+        	{
+        		name: "Google Aerial",
+            active: true,
+        		layer: googleSat
+        	},
+        	{
+        		group: "Road Layers",
+        		collapsed: true,
+        		layers: [
+        			{
+        				name: "Mapbox Streets",
+        				layer: mapboxStreets
+        			},
+        			{
+        				name: "Google Hybrid",
+        				layer: googleHybrid
+        			}
+        		]
+        	}
+        ];
 
-    L.control.layers(overlays).addTo(map);
+    var overLayers = [
+      	{
+      		group: "Lines",
+      		layers: [
+      			{
+      				active: true,
+      				name: "Meters",
+      				layer: waterLines
+      			},
+      			{
+      				active: true,
+      				name: "Valves",
+      				layer: sewerLines
+      			},
+      		]
+      	},
+      	{
+      		group: "Points",
+      		layers: [
+      			{
+      				active: false,
+      				name: "Meters",
+      				layer: meters
+      			},
+      			{
+      				active: false,
+      				name: "Valves",
+      				layer: valves
+      			}
+      		]
+      	}
+      ];
+
+  var panelLayers = new L.Control.PanelLayers(baseLayers, overLayers, {
+    	//compact: true,
+    	//collapsed: true,
+    	collapsibleGroups: true
+    });
+
+map.addControl(panelLayers);
+    //L.control.layers(overlays).addTo(map);
     //L.control.locate().addTo(map);
 
 
