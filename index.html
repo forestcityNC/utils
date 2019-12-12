@@ -13,7 +13,7 @@
   <!-- JS -->
   <script src="https://unpkg.com/browse/jquery@3.3.1/dist/jquery.min.js" async></script>
   <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js" integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew==" crossorigin=""></script>
-  <script src="./js/leaflet.ajax.min.js"> </script>
+  <script src="./js/leaflet.ajax.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.68.0/dist/L.Control.Locate.min.js" charset="utf-8"></script>
 
   <style>
@@ -38,12 +38,11 @@
   <script>
     // basemaps and layers //
 
-    var googleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{ maxZoom: 22, subdomains:['mt0','mt1','mt2','mt3']});
+    var googleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
+      maxZoom: 22,
+      subdomains:['mt0','mt1','mt2','mt3']
+    });
 
-    var map = L.map('map', {
-    			    layers: [googleSat] // only add one!
-    		    }).setView([35.339744, -81.872195], 18);
-    // end basemaps //
 
     // feature styles, then layers //
     var waterStyle = {
@@ -119,8 +118,11 @@
       "Water Valve": valves
 		};
 
-    map.addLayer(waterLines)
-    map.addLayer(sewerLines)
+    var map = L.map('map', {
+              layers: [googleSat, waterLines, sewerLines] // only add one!
+            }).setView([35.339744, -81.872195], 18);
+    // end basemaps //
+
 
     L.control.layers(overlays).addTo(map);
     //L.control.locate().addTo(map);
