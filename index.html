@@ -1,26 +1,21 @@
 <<!DOCTYPE html>
 <html>
 <head>
-  <title>Forest City - Utilities Viewer</title>
-  <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Forest City - Water Line Viewer</title>
+	<meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin=""/>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.68.0/dist/L.Control.Locate.min.css" />
-  <link rel="stylesheet" href="./css/leaflet-panel-layers.min.css" />
 
   <!-- JS -->
+  <script src="https://unpkg.com/browse/jquery@3.3.1/dist/jquery.min.js" async></script>
   <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js" integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew==" crossorigin=""></script>
-  <script src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
   <script src="./js/leaflet.ajax.min.js"> </script>
   <script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.68.0/dist/L.Control.Locate.min.js" charset="utf-8"></script>
-  <script src="./js/leaflet-panel-layers.min.js"></script>
+
   <style>
 		html, body {
 			height: 100%;
@@ -41,7 +36,8 @@
 
 
   <script>
-    // basemaps //
+    // basemaps and layers //
+
     var googleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{ maxZoom: 22, subdomains:['mt0','mt1','mt2','mt3']});
 
     var map = L.map('map', {
@@ -80,28 +76,15 @@
       fillOpacity: 0.8
     };
 
-    // end styles //
-    // begin layers //
-
-    var panel = L.control.panelLayers();
-
-    $.getJSON('data/waterLines.geojson', function(data){
-	    panel.addOverlay({
-		    name: "Drinking Water",
-		    icon: '<i class="icon icon-water"></i>',
-		    layer: L.geoJson(data)
-	    });
+    var waterLines = new L.GeoJSON.AJAX("data/waterLines.geojson", {
+      style: waterStyle,
+      onEachFeature: function (feature, layer) {
+        layer.bindPopup(
+          '<h3>' + feature.properties.DIAMETER + ' ' + feature.properties.MATERIAL + '</h3>'
+      )},
     });
 
-  //  var waterLines = new L.GeoJSON.AJAX("./data/waterLines.geojson", {
-  //    style: waterStyle,
-  //    onEachFeature: function (feature, layer) {
-  //      layer.bindPopup(
-  //        '<h3>' + feature.properties.DIAMETER + ' ' + feature.properties.MATERIAL + '</h3>'
-  //    )},
-  //  });
-
-    var sewerLines = new L.GeoJSON.AJAX("./data/sewerLines.geojson", {
+    var sewerLines = new L.GeoJSON.AJAX("data/sewerLines.geojson", {
       style: sewerStyle,
       onEachFeature: function (feature, layer) {
         layer.bindPopup(
@@ -109,7 +92,7 @@
       )},
     });
 
-    var meters = new L.GeoJSON.AJAX("./data/meters.geojson", {
+    var meters = new L.GeoJSON.AJAX("data/meters.geojson", {
       pointToLayer: function (feature, latlng) {
        return L.circleMarker(latlng, meterStyle);
      },
@@ -119,7 +102,7 @@
       )},
     });
 
-    var valves = new L.GeoJSON.AJAX("./data/valves.geojson", {
+    var valves = new L.GeoJSON.AJAX("data/valves.geojson", {
       pointToLayer: function (feature, latlng) {
        return L.circleMarker(latlng, valveStyle);
      },
@@ -129,23 +112,18 @@
       )},
     });
 
+    var overlays = {
+      "Water Lines": waterLines,
+      "Sewer Lines": sewerLines,
+      "Water Meter": meters,
+      "Water Valve": valves
+		};
 
+    map.addLayer(waterLines)
+    map.addLayer(sewerLines)
 
-
-
-
-
-    //var overlays = {
-    //  "Water Lines": waterLines,
-    //  "Sewer Lines": sewerLines,
-    //  "Water Meter": meters,
-    //  "Water Valve": valves
-		//};
-
-    //map.addLayer(waterLines)
-    //map.addLayer(sewerLines)
-    //L.control.layers(overlays).addTo(map);
-
+    L.control.layers(overlays).addTo(map);
+    //L.control.locate().addTo(map);
 
 
 
