@@ -1,4 +1,4 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
   <title>Forest City - Water Line Viewer</title>
@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.68.0/dist/L.Control.Locate.min.css" />
   <link rel="stylesheet" href="./css/leaflet-panel-layers.min.css" />
+  <link rel="stylesheet" href="./css/leaflet-search.css" />
 
   <!-- JS -->
   <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
@@ -17,6 +18,7 @@
   <script src="./js/leaflet.ajax.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.68.0/dist/L.Control.Locate.min.js" charset="utf-8"></script>
   <script src="./js/leaflet-panel-layers.min.js"></script>
+  <script src="./js/leaflet-search.js"></script>
 
   <style>
 		html, body {
@@ -78,7 +80,7 @@
         "opacity": 1
     };
 
-    var meterStyle= {
+    var meterStyle = {
       radius: 3,
       fillColor: "#ff7800",
       color: "#000",
@@ -87,13 +89,22 @@
       fillOpacity: 0.8
     };
 
-    var valveStyle= {
+    var valveStyle = {
       radius: 3,
       fillColor: "#f3a6b2",
       color: "#000",
       weight: 1,
       opacity: 1,
       fillOpacity: 0.8
+    };
+
+    var addressStyle = {
+      radius: 0,
+      fillColor: "#f3a6b2",
+      color: "#000",
+      weight: 1,
+      opacity: 0,
+      fillOpacity: 0
     };
 
     var waterLines = new L.GeoJSON.AJAX("data/waterLines.geojson", {
@@ -199,16 +210,51 @@
       	}
       ];
 
-  var panelLayers = new L.Control.PanelLayers(baseLayers, overLayers, {
+    var panelLayers = new L.Control.PanelLayers(baseLayers, overLayers, {
     	//compact: true,
     	//collapsed: true,
-    	collapsibleGroups: true
-    });
+    	    collapsibleGroups: true
+      });
 
-map.addControl(panelLayers);
+    map.addControl(panelLayers);
     //L.control.layers(overlays).addTo(map);
     //L.control.locate().addTo(map);
 
+    var addresses = new L.GeoJSON.AJAX("data/address.geojson", {
+      pointToLayer: function (feature, latlng) {
+       return L.circleMarker(latlng, addressStyle);
+      },
+    }).addTo(map);
+
+    var searchControl = new L.Control.Search({
+		      layer: addresses,
+		      propertyName: 'full_addre',
+		      marker: false,
+		      moveToLocation: function(latlng, title, map) {
+			      //map.fitBounds( latlng.layer.getBounds() );
+			      var zoom = map.getBoundsZoom(latlng.layer.getBounds());
+  			    map.setView(latlng, zoom); // access the zoom
+		      }
+	  });
+
+    searchControl.on('search:locationfound', function(e) {
+
+		//console.log('search:locationfound', );
+
+		//map.removeLayer(this._markerSearch)
+
+		  e.layer.setStyle({fillColor: '#3f0', color: '#0f0'});
+		  if(e.layer._popup)
+		    e.layer.openPopup();
+
+	  }).on('search:collapsed', function(e) {
+
+		  featuresLayer.eachLayer(function(layer) {	//restore feature color
+			  featuresLayer.resetStyle(layer);
+		  });
+	  });
+
+    map.addControl(searchControl);
 
 
 
