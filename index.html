@@ -44,6 +44,8 @@
     });
 
 
+    // end basemaps //
+
     // feature styles, then layers //
     var waterStyle = {
         "color": "#487bb6",
@@ -119,10 +121,8 @@
 		};
 
     var map = L.map('map', {
-              layers: [googleSat, waterLines, sewerLines] // only add one!
-            }).setView([35.339744, -81.872195], 18);
-    // end basemaps //
-
+    			    layers: [googleSat, sewerLines, waterLines] // only add one!
+    		    }).setView([35.339744, -81.872195], 18);
 
     L.control.layers(overlays).addTo(map);
     //L.control.locate().addTo(map);
