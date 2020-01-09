@@ -46,9 +46,8 @@
 
     // basemaps, added in L.control.panellayers  //
 
-    var googleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
-          maxZoom: 22,
-          subdomains:['mt0','mt1','mt2','mt3']
+    var ortho2019 = L.tileLayer.wms('https://services.nconemap.gov/secure/services/Imagery/Orthoimagery_2019/ImageServer/WMSServer?', {
+      layers: '0'
     });
 
     var mapboxStreets = L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v9/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiZGJoYXJyaXM5MiIsImEiOiJjamo1dm5hOGswOHMzM2tubm12OGhjdXdzIn0.MXeiHXd9767rehYZ2fBVHQ', {
@@ -79,6 +78,15 @@
         "weight": 3,
         "opacity": 1
     };
+
+    // var electricStyle = function(feature) {
+    //   return {
+    //     color: #e31a1c,
+    //     weight: 5 ,
+    //     opacity: 1 ,
+    //     dashArray: '',
+    //   };
+    // }
 
     var meterStyle = {
       radius: 3,
@@ -152,9 +160,9 @@
 
     var baseLayers = [
         	{
-        		name: "Google Aerial",
+        		name: "2019 Imagery",
             active: true,
-        		layer: googleSat
+        		layer: ortho2019
         	},
         	{
         		group: "Road Layers",
@@ -235,23 +243,6 @@
 			      var zoom = map.getBoundsZoom(latlng.layer.getBounds());
   			    map.setView(latlng, zoom); // access the zoom
 		      }
-	  });
-
-    searchControl.on('search:locationfound', function(e) {
-
-		//console.log('search:locationfound', );
-
-		//map.removeLayer(this._markerSearch)
-
-		  e.layer.setStyle({fillColor: '#3f0', color: '#0f0'});
-		  if(e.layer._popup)
-		    e.layer.openPopup();
-
-	  }).on('search:collapsed', function(e) {
-
-		  featuresLayer.eachLayer(function(layer) {	//restore feature color
-			  featuresLayer.resetStyle(layer);
-		  });
 	  });
 
     map.addControl(searchControl);
