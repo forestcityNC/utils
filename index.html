@@ -65,6 +65,12 @@
           maxZoom: 22,
           subdomains:['mt0','mt1','mt2','mt3']
     });
+
+    var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    });
+
     // end basemaps //
 
     // feature styles, then layers //
@@ -79,6 +85,17 @@
         "weight": 3,
         "opacity": 1
     };
+
+    var electricStyle = function(feature) {
+      switch(feature.properties.phase){
+        case '1OH': return {color: 'red', weight: 1};
+        case '1UG': return {color: 'red', weight: 1, dashArray: '10,5'}
+        case '2OH': return {color: 'red', weight: 2};
+        case '2UG': return {color: 'red', weight: 2, dashArray: '10,5'}
+        case '3OH': return {color: 'red', weight: 3};
+        case '3UG': return {color: 'red', weight: 3, dashArray: '10,5'}
+      }
+  };
 
     // var electricStyle = function(feature) {
     //   return {
@@ -132,6 +149,14 @@
       )},
     });
 
+    var electricLines = new L.GeoJSON.AJAX('data/electricLines.geojson', {
+      style: electricStyle,
+      onEachFeature: function (feature, layer) {
+        layer.bindPopup(
+          '<h3>' + feature.properties.phase + '</h3>'
+      )},
+    });
+
     var meters = new L.GeoJSON.AJAX("data/meters.geojson", {
       pointToLayer: function (feature, latlng) {
        return L.circleMarker(latlng, meterStyle);
@@ -161,7 +186,7 @@
 
     var baseLayers = [
         	{
-        		name: "2019 Imagery",
+        		name: "2019 Satelitte",
             active: true,
         		layer: ortho2019
         	},
@@ -195,11 +220,11 @@
       				name: "Sewer",
       				layer: sewerLines
       			},
-            // {
-      			// 	active: false,
-      			// 	name: "Electric",
-      			// 	layer: electricLines
-      			// },
+            {
+      				active: false,
+      				name: "Electric",
+      				layer: electricLines
+      			},
       		]
       	},
       	{
