@@ -89,35 +89,32 @@
     var electricStyle = function(feature) {
       switch(feature.properties.phase){
         case '1OH': return {color: 'red', weight: 1};
-        case '1UG': return {color: 'red', weight: 1, dashArray: '10,5'}
+        case '1UG': return {color: 'red', weight: 1, dashArray: '10,5'};
         case '2OH': return {color: 'red', weight: 2};
-        case '2UG': return {color: 'red', weight: 2, dashArray: '10,5'}
+        case '2UG': return {color: 'red', weight: 2, dashArray: '10,5'};
         case '3OH': return {color: 'red', weight: 3};
-        case '3UG': return {color: 'red', weight: 3, dashArray: '10,5'}
+        case '3UG': return {color: 'red', weight: 3, dashArray: '10,5'};
       }
-  };
+    };
 
-    // var electricStyle = function(feature) {
-    //   return {
-    //     color: #e31a1c,
-    //     weight: 5 ,
-    //     opacity: 1 ,
-    //     dashArray: '',
-    //   };
-    // }
+     var wvIcon = L.icon({
+        iconUrl:'images/wv.png',
+        iconSize: [25,25],
+        iconAnchor: [10,10],
+        popupAnchor: [-3,-26]
+    });
+
+    var arvIcon = L.icon({
+        iconUrl:'images/arv.png',
+        iconSize: [25,25],
+        iconAnchor: [10,10],
+        popupAnchor: [-3,-26]
+    });
+
 
     var meterStyle = {
       radius: 3,
       fillColor: "#ff7800",
-      color: "#000",
-      weight: 1,
-      opacity: 1,
-      fillOpacity: 0.8
-    };
-
-    var valveStyle = {
-      radius: 3,
-      fillColor: "#f3a6b2",
       color: "#000",
       weight: 1,
       opacity: 1,
@@ -169,20 +166,13 @@
 
     var valves = new L.GeoJSON.AJAX("data/valves.geojson", {
       pointToLayer: function (feature, latlng) {
-       return L.circleMarker(latlng, valveStyle);
-     },
+        return L.marker(latlng, {icon:wvIcon});
+      },
       onEachFeature: function (feature, layer) {
-        layer.bindPopup(
-          '<h3>' + feature.properties.FEATURE + '</h3>'
-      )},
+        layer.bindPopup(feature.properties.valve);
+      }
     });
 
-    // var overlays = {
-    //   "Water Lines": waterLines,
-    //   "Sewer Lines": sewerLines,
-    //   "Water Meter": meters,
-    //   "Water Valve": valves
-		// };
 
     var baseLayers = [
         	{
