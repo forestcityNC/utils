@@ -14,11 +14,14 @@
 
   <!-- JS -->
   <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3@5.15.0/dist/d3.js"></script>
   <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js" integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew==" crossorigin=""></script>
   <script src="./js/leaflet.ajax.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.68.0/dist/L.Control.Locate.min.js" charset="utf-8"></script>
   <script src="./js/leaflet-panel-layers.min.js"></script>
   <script src="./js/leaflet-search.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pixi.js@5.2.1/dist/pixi.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/leaflet-pixi-overlay@1.8.1/L.PixiOverlay.min.js" charset="utf-8"></script>
 
   <style>
 		html, body {
@@ -38,11 +41,10 @@
 <div id='map'></div>
 
 
-
   <script>
     var map = L.map('map', {
     			    //layers: [googleSat, sewerLines, waterLines]
-    		}).setView([35.339744, -81.872195], 18);
+    		}).setView([35.332744, -81.865195], 17);
 
     // basemaps, added in L.control.panellayers  //
 
@@ -97,20 +99,33 @@
       }
     };
 
-     var wvIcon = L.icon({
+    var wvIcon = L.icon({
         iconUrl:'images/wv.png',
         iconSize: [25,25],
-        iconAnchor: [10,10],
-        popupAnchor: [-3,-26]
-    });
+        iconAnchor: [0,0],
+        popupAnchor: [-1, -10]
+     });
 
     var arvIcon = L.icon({
         iconUrl:'images/arv.png',
         iconSize: [25,25],
-        iconAnchor: [10,10],
-        popupAnchor: [-3,-26]
+        iconAnchor: [0,0],
+        popupAnchor: [-1, -10]
     });
 
+    var bovIcon = L.icon({
+        iconUrl:'images/bov.png',
+        iconSize: [25,25],
+        iconAnchor: [0,0],
+        popupAnchor: [-1, -10]
+    });
+
+    var svIcon = L.icon({
+        iconUrl:'images/sv.png',
+        iconSize: [25,25],
+        iconAnchor: [0,0],
+        popupAnchor: [-1, -10]
+    });
 
     var meterStyle = {
       radius: 3,
@@ -154,7 +169,7 @@
       )},
     });
 
-    var meters = new L.GeoJSON.AJAX("data/meters.geojson", {
+    var meters = new L.GeoJSON.AJAX('data/meters.geojson', {
       pointToLayer: function (feature, latlng) {
        return L.circleMarker(latlng, meterStyle);
      },
@@ -166,13 +181,29 @@
 
     var valves = new L.GeoJSON.AJAX("data/valves.geojson", {
       pointToLayer: function (feature, latlng) {
-        return L.marker(latlng, {icon:wvIcon});
+        switch (feature.properties.valve) {
+          case 'wv':
+            return L.marker(latlng,
+              {icon:wvIcon});
+          case 'arv':
+            return L.marker(latlng,
+              {icon:arvIcon});
+          case 'sv':
+            return L.marker(latlng,
+              {icon:svIcon});
+          case 'bov':
+            return L.marker(latlng,
+              {icon:bovIcon});
+          default:
+            return L.circleMarker(latlng, {
+              color: "#fff"
+            });
+        }
       },
       onEachFeature: function (feature, layer) {
         layer.bindPopup(feature.properties.valve);
       }
     });
-
 
     var baseLayers = [
         	{
@@ -198,41 +229,48 @@
 
     var overLayers = [
       	{
-      		group: "Lines",
-      		layers: [
-      			{
-      				active: true,
-      				name: "Water",
-      				layer: waterLines
-      			},
-      			{
-      				active: false,
-      				name: "Sewer",
-      				layer: sewerLines
-      			},
-            {
-      				active: false,
-      				name: "Electric",
-      				layer: electricLines
-      			},
-      		]
-      	},
-      	{
-      		group: "Points",
+      		group: "Water",
           collapsed: true,
       		layers: [
       			{
       				active: false,
-      				name: "Meters",
-      				layer: meters
+      				name: "Water Lines",
+      				layer: waterLines
       			},
       			{
+              active: false,
+              name: "Meters",
+              layer: meters
+      			},
+            {
+              active: false,
+              name: "Valves",
+              layer: valves
+      			},
+      		]
+      	},
+      	{
+      		group: "Sewer",
+          collapsed: true,
+      		layers: [
+      			{
       				active: false,
-      				name: "Valves",
-      				layer: valves
+      				name: "Sewer Lines",
+      				layer: sewerLines
       			}
       		]
-      	}
+      	},
+        {
+      		group: "Electric",
+          collapsed: true,
+      		layers: [
+      			{
+      				active: false,
+      				name: "Electric Lines",
+      				layer: electricLines
+      			}
+      		]
+      	},
       ];
 
     var panelLayers = new L.Control.PanelLayers(baseLayers, overLayers, {
