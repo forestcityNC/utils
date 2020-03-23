@@ -322,29 +322,21 @@
     var sidebar = L.control.sidebar('sidebar', { autoPan: false, closeButton: false });
     sidebar.addTo(map);
 
-    var addrSearch = new L.Control.Search({
-		      layer: addresses,
-		      propertyName: 'full_addre',
-          textPlaceholder: 'Search Addresses',
-		      marker: ovrdcMarker,
-		      circleLocation: false,
-          minLength: 2,
-          collapsed: false,
-          autoCollapse: false
-	  });
-    addrSearch.addTo(map);
-
-    var circle;
-    var marker;
-    addrSearch.on('search_locationfound', function(e) {
-      addrSearch.collapse();
-      if(marker){
-        map.removeLayer(marker);
-      }
-      var name = e.display_name;
-      marker = new L.marker([e.latlng.lat, e.latlng.lng], {icon: ovrdcMarker}).addTo(map);
-    });
-
+    var search = new L.Control.Search({
+      layer: meters,
+      initial: false,
+      propertyName: 'description',
+      circleLocation:false,
+      collapsed:false,
+      textPlaceholder:'Search Meters',
+      zoom:'17'});
+    search.on('search_locationfound', function() { map.setZoom(18); });
+    search.on ('search_locationfound', function(e) {
+        e.layer.fire('click');
+        search.collapse();
+      });
+    map.addControl(search);
+  
     var hash = L.hash(map);
     var gpsLocate = L.control.locate({follow: true, locateOptions: {enableHighAccuracy: true}});
     //gpsLocate.addTo(map);
@@ -355,20 +347,20 @@
     var globalsearchToggle = new L.easyButton({
         states: [{
           stateName: 'show',
-          icon: 'fa-exchange fa-lg',
+          icon: 'fa-exchange fa-border fa-lg',
           title: 'Search Addresses',
           onClick: function(btn, map) {
-            addrSearch.addTo(map);
-          btn.state('hide');
-            }
-          },{
-          stateName: 'hide',
-        icon: 'fa-exchange fa-border fa-lg',
-          title: 'Search Meters',
-          onClick: function(btn, map) {
-            map.removeControl(addrSearch);
-            btn.state('show');
+            map.removeControl(search);
+            btn.state('hide');
           }
+          },{
+            stateName: 'hide',
+            icon: 'fa-exchange fa-lg',
+            title: 'Search Meters',
+            onClick: function(btn, map) {
+              search.addTo(map);
+              btn.state('show');
+            }
         }]
       });
 
@@ -498,20 +490,30 @@
       else {}
     };
 
-    var search = new L.Control.Search({
-      layer: meters,
-      initial: false,
-      propertyName: 'description',
-      circleLocation:false,
-      collapsed:false,
-      textPlaceholder:'Search Meters',
-      zoom:'17'});
-    search.on('search_locationfound', function() { map.setZoom(18); });
-    search.on ('search_locationfound', function(e) {
-        e.layer.fire('click');
-        search.collapse();
-      });
-    map.addControl(search);
+    var addrSearch = new L.Control.Search({
+          layer: addresses,
+          propertyName: 'full_addre',
+          textPlaceholder: 'Search Addresses',
+          marker: ovrdcMarker,
+          circleLocation: false,
+          minLength: 2,
+          collapsed: false,
+          autoCollapse: false
+    });
+    addrSearch.addTo(map);
+
+    var circle;
+    var marker;
+    addrSearch.on('search_locationfound', function(e) {
+      addrSearch.collapse();
+      if(marker){
+        map.removeLayer(marker);
+      }
+      var name = e.display_name;
+      marker = new L.marker([e.latlng.lat, e.latlng.lng], {icon: ovrdcMarker}).addTo(map);
+    });
+
+
 
 
   </script>
