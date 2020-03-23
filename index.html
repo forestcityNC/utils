@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.68.0/dist/L.Control.Locate.min.css" />
   <link rel="stylesheet" href="./css/leaflet-panel-layers.min.css" />
   <link rel="stylesheet" href="./css/leaflet-search.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.70.0/dist/L.Control.Locate.min.css" />
 
   <!-- JS -->
   <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
@@ -22,6 +23,7 @@
   <script src="./js/leaflet-search.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/pixi.js@5.2.1/dist/pixi.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/leaflet-pixi-overlay@1.8.1/L.PixiOverlay.min.js" charset="utf-8"></script>
+  <script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.70.0/dist/L.Control.Locate.min.js" charset="utf-8"></script>
 
   <style>
 		html, body {
@@ -45,6 +47,10 @@
     var map = L.map('map', {
     			    //layers: [googleSat, sewerLines, waterLines]
     		}).setView([35.332744, -81.865195], 17);
+
+    var locate = new L.control.locate({
+        drawCircle: true
+    }).addTo(map);
 
     // basemaps, added in L.control.panellayers  //
 
