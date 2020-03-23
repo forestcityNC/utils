@@ -8,10 +8,18 @@
   <!-- CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin=""/>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.68.0/dist/L.Control.Locate.min.css" />
   <link rel="stylesheet" href="./css/leaflet-panel-layers.min.css" />
   <link rel="stylesheet" href="./css/leaflet-search.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.70.0/dist/L.Control.Locate.min.css" />
+  <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
+  <link rel="stylesheet" href="./css/leaflet.print.css" />
+  <link rel="stylesheet" href="./css/L.Control.Sidebar.css" />
+  <link rel="stylesheet" href="./css/L.Control.Loading.css" />
+  <link rel="stylesheet" href="./css/leaflet.defaultextent.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.css">
+  <link rel="stylesheet" href="./css/ovrdc-style.css" />
+  <link rel="stylesheet" href="./css/modern-ui.css" />
+
 
   <!-- JS -->
   <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
@@ -21,9 +29,15 @@
   <script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.68.0/dist/L.Control.Locate.min.js" charset="utf-8"></script>
   <script src="./js/leaflet-panel-layers.min.js"></script>
   <script src="./js/leaflet-search.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/pixi.js@5.2.1/dist/pixi.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/leaflet-pixi-overlay@1.8.1/L.PixiOverlay.min.js" charset="utf-8"></script>
+  <script src="./js/leaflet.print.js"></script>
+  <script src="./js/leaflet.defaultextent.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.70.0/dist/L.Control.Locate.min.js" charset="utf-8"></script>
+  <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
+  <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-hash/v0.2.1/leaflet-hash.js'></script>
+  <script src="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.js"></script>
+  <script src="./js/leaflet.browser.print.min.js"></script>
+  <script src="./js/L.Control.Sidebar.js"></script>
+  <script src="./js/L.Control.Loading.js"></script>
 
   <style>
 		html, body {
@@ -40,17 +54,22 @@
 </head>
 
 <body>
-<div id='map'></div>
+<div id='map'>
+  <div id="sidebar">
+		<h3>Navigation Data Center <br>Facilities Near The Ports of CNKY</h3>
+		<hr>
+		<div id="mapinfo"></div>
+	</div>
+	<div id="globalsearch" style="position:absolute;left:10px;top:51px;height:38px;width:450px;z-index:1;"></div>
+
+
+</div>
 
 
   <script>
     var map = L.map('map', {
     			    //layers: [googleSat, sewerLines, waterLines]
     		}).setView([35.332744, -81.865195], 17);
-
-    var locate = new L.control.locate({
-        drawCircle: true
-    }).addTo(map);
 
     // basemaps, added in L.control.panellayers  //
 
@@ -73,12 +92,6 @@
           maxZoom: 22,
           subdomains:['mt0','mt1','mt2','mt3']
     });
-
-    var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    });
-
     // end basemaps //
 
     // feature styles, then layers //
@@ -295,19 +308,210 @@
       },
     }).addTo(map);
 
-    var searchControl = new L.Control.Search({
+    // begin toolbar //
+    var ovrdcMarker = L.icon({
+        iconUrl: './images/ovrdc-marker.png',
+        //shadowUrl: 'leaf-shadow.png',
+
+        iconSize:     [48, 48], // size of the icon
+        //shadowSize:   [50, 64], // size of the shadow
+        iconAnchor:   [24, 42], // point of the icon which will correspond to marker's location - half the width and height of icon
+        //shadowAnchor: [4, 62],  // the same for the shadow
+        popupAnchor:  [0, -42] // point from which the popup should open relative to the iconAnchor
+    });
+    var sidebar = L.control.sidebar('sidebar', { autoPan: false, closeButton: false });
+    sidebar.addTo(map);
+
+    var addrSearch = new L.Control.Search({
 		      layer: addresses,
 		      propertyName: 'full_addre',
-		      marker: false,
-		      moveToLocation: function(latlng, title, map) {
-			      //map.fitBounds( latlng.layer.getBounds() );
-			      var zoom = map.getBoundsZoom(latlng.layer.getBounds());
-  			    map.setView(latlng, zoom); // access the zoom
-		      }
+          textPlaceholder: 'Search Addresses',
+		      marker: ovrdcMarker,
+		      circleLocation: false,
+          minLength: 2,
+          collapsed: false,
+          autoCollapse: false
 	  });
+    addrSearch.addTo(map);
 
-    map.addControl(searchControl);
+    var circle;
+    var marker;
+    addrSearch.on('search_locationfound', function(e) {
+      addrSearch.collapse();
+      if(marker){
+        map.removeLayer(marker);
+      }
+      var name = e.display_name;
+      marker = new L.marker([e.latlng.lat, e.latlng.lng], {icon: ovrdcMarker}).addTo(map);
+    });
 
+    var hash = L.hash(map);
+    var gpsLocate = L.control.locate({follow: true, locateOptions: {enableHighAccuracy: true}});
+    //gpsLocate.addTo(map);
+    var homeExtent = L.control.defaultExtent({});
+    //homeExtent.addTo(map);
+    var fullscreen = L.control.fullscreen();
+
+    var globalsearchToggle = new L.easyButton({
+        states: [{
+          stateName: 'show',
+          icon: 'fa-exchange fa-lg',
+          title: 'Search Addresses',
+          onClick: function(btn, map) {
+            addrSearch.addTo(map);
+          btn.state('hide');
+            }
+          },{
+          stateName: 'hide',
+        icon: 'fa-exchange fa-border fa-lg',
+          title: 'Search Meters',
+          onClick: function(btn, map) {
+            map.removeControl(addrSearch);
+            btn.state('show');
+          }
+        }]
+      });
+
+    var sidebarToggle = L.easyButton({
+          states: [{
+                  stateName: 'open-sidebar',   // name the state
+                  icon:      'fa-bars fa-lg',          // and define it's properties
+                  title:     'Show Sidebar', // like it's title
+                  onClick: function(btn, map) {  // and it's callback
+                      sidebar.show();
+                      btn.state('close-sidebar'); // change state on click!
+                  }
+              }, {
+                  stateName: 'close-sidebar',
+                  icon:      'fa-times fa-2x',
+                  title:     'Hide Sidebar',
+                  onClick: function(btn, map) {
+                      sidebar.hide();
+                      btn.state('open-sidebar');
+                  }
+          }],
+        id: 'menu',
+     });
+
+    var stogglebar = L.easyBar([sidebarToggle], {id: 'toggle'}).addTo(map);
+    var leafletprint = L.control.browserPrint().addTo(map);
+
+    sidebar.on('hide', function () {
+        sidebarToggle.state('open-sidebar');
+    });
+    sidebar.on('show', function () {
+        sidebarToggle.state('close-sidebar');
+    });
+
+    var toolshidden = false;
+    var mobilescreen = false;
+
+    var tools = L.easyButton({
+          states: [{
+                  stateName: 'show-tools',   // name the state
+                  icon:      'fa-cogs fa-lg',          // and define it's properties
+                  title:     'Show Map Tools', // like it's title
+                  onClick: function(btn, map) {  // and it's callback
+                      leafletprint.addTo(map);
+                      gpsLocate.addTo(map);
+                      homeExtent.addTo(map);
+                      fullscreen.addTo(map);
+
+                      globalsearchToggle.addTo(map);
+
+                      btn.state('hide-tools'); // change state on click!
+                      toolshidden = false;
+                      //console.log(toolshidden + ' state changed to hideTools');
+                  }
+              }, {
+                  stateName: 'hide-tools',
+                  icon:      'fa-cogs fa-border fa-lg',
+                  title:     'Hide Map Tools',
+                  onClick: function(btn, map) {
+                      map.removeControl(leafletprint);
+                      map.removeControl(gpsLocate);
+                      map.removeControl(homeExtent);
+                      map.removeControl(fullscreen);
+
+                      map.removeControl(globalsearchToggle);
+
+                      btn.state('show-tools');
+                      toolshidden = true;
+                      //console.log(toolshidden+ ' state changed to showTools');
+                  }
+          }],
+        id: 'tools',
+     });
+    console.log('tools loaded');
+    var w = window.innerWidth;
+    console.log('screen width: ' + w);
+    if (w < 481) {
+      tools.addTo(map);
+      toolshidden = true;
+      mobilescreen = true;
+      //console.log('mobile tool toggle');
+      //console.log(toolshidden + "mobilescreen: " + mobilescreen);
+    }else{
+      leafletprint.addTo(map);
+      gpsLocate.addTo(map);
+      homeExtent.addTo(map);
+      fullscreen.addTo(map);
+
+      globalsearchToggle.addTo(map);
+
+      toolshidden = false;
+      //console.log(toolshidden + " " + mobilescreen);
+    }
+    window.onresize = function() {
+      if ( toolshidden === true && window.innerWidth > 480 && mobilescreen === true) {
+        leafletprint.addTo(map);
+        gpsLocate.addTo(map);
+        homeExtent.addTo(map);
+        fullscreen.addTo(map);
+
+        globalsearchToggle.addTo(map);
+
+        map.removeControl(tools);
+        toolshidden = false;
+        mobilescreen = false;
+        //console.log(toolshidden + " " + mobilescreen);
+      }
+      else if ( toolshidden === false && mobilescreen === true && window.innerWidth > 481) {
+        tools.state('show-tools');
+        mobilescreen = false;
+        map.removeControl(tools);
+        //console.log(toolshidden + "" + mobilescreen);
+      }
+      else if ( toolshidden === false && window.innerWidth < 481 && mobilescreen === false) {
+        map.removeControl(leafletprint);
+        map.removeControl(gpsLocate);
+        map.removeControl(homeExtent);
+        map.removeControl(fullscreen);
+
+        map.removeControl(globalsearchToggle);
+
+        tools.addTo(map);
+        toolshidden = true;
+        mobilescreen = true;
+        //console.log(toolshidden + " " + mobilescreen);
+      }
+      else {}
+    };
+
+    var search = new L.Control.Search({
+      layer: meters,
+      initial: false,
+      propertyName: 'description',
+      circleLocation:false,
+      collapsed:false,
+      textPlaceholder:'Search Meters',
+      zoom:'17'});
+    search.on('search_locationfound', function() { map.setZoom(18); });
+    search.on ('search_locationfound', function(e) {
+        e.layer.fire('click');
+        search.collapse();
+      });
+    map.addControl(search);
 
 
   </script>
