@@ -120,28 +120,28 @@
 
     var wvIcon = L.icon({
         iconUrl:'images/wv.png',
-        iconSize: [25,25],
+        iconSize: [20,20],
         iconAnchor: [0,0],
         popupAnchor: [-1, -10]
      });
 
     var arvIcon = L.icon({
         iconUrl:'images/arv.png',
-        iconSize: [25,25],
+        iconSize: [20,20],
         iconAnchor: [0,0],
         popupAnchor: [-1, -10]
     });
 
     var bovIcon = L.icon({
         iconUrl:'images/bov.png',
-        iconSize: [25,25],
+        iconSize: [20,20],
         iconAnchor: [0,0],
         popupAnchor: [-1, -10]
     });
 
     var svIcon = L.icon({
         iconUrl:'images/sv.png',
-        iconSize: [25,25],
+        iconSize: [20,20],
         iconAnchor: [0,0],
         popupAnchor: [-1, -10]
     });
@@ -248,13 +248,18 @@
 
     var overLayers = [
       	{
-      		group: "Water",
+      		group: "Water/Sewer",
           collapsed: true,
       		layers: [
       			{
-      				active: false,
+      				active: true,
       				name: "Water Lines",
       				layer: waterLines
+      			},
+            {
+      				active: false,
+      				name: "Sewer Lines",
+      				layer: sewerLines
       			},
       			{
               active: false,
@@ -268,23 +273,12 @@
       			},
       		]
       	},
-      	{
-      		group: "Sewer",
-          collapsed: true,
-      		layers: [
-      			{
-      				active: false,
-      				name: "Sewer Lines",
-      				layer: sewerLines
-      			}
-      		]
-      	},
         {
       		group: "Electric",
           collapsed: true,
       		layers: [
       			{
-      				active: false,
+      				active: true,
       				name: "Electric Lines",
       				layer: electricLines
       			}
@@ -293,9 +287,9 @@
       ];
 
     var panelLayers = new L.Control.PanelLayers(baseLayers, overLayers, {
-    	//compact: true,
-    	//collapsed: true,
-    	    collapsibleGroups: true
+    	    collapsibleGroups: true,
+          compact: true,
+          position: 'bottomright'
       });
 
     map.addControl(panelLayers);
@@ -336,7 +330,7 @@
         search.collapse();
       });
     map.addControl(search);
-  
+
     var hash = L.hash(map);
     var gpsLocate = L.control.locate({follow: true, locateOptions: {enableHighAccuracy: true}});
     //gpsLocate.addTo(map);
